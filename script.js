@@ -1,8 +1,8 @@
 let board = ['', '', '',
-             '', '', '',        
-             '', '', ''];
+    '', '', '',
+    '', '', ''];
 
-function createPlayer(symbol) {
+function createPlayer(symbol) {  //factory function to make a player
     return {
         symbol,
         makeMove(i) {
@@ -12,11 +12,11 @@ function createPlayer(symbol) {
             } else {
                 console.log(`Position ${i} is already taken. Player ${this.symbol} cannot make a move.`);
             }
-        } 
+        }
     }
 }
 
-class Game {
+class Game {  // class to manage the game state
     constructor(playerOne, playerTwo) {
         this.playerOne = createPlayer('X');
         this.playerTwo = createPlayer('O');
@@ -34,7 +34,7 @@ class Game {
             [0, 4, 8], [6, 4, 2]             // Diagonals
         ];
 
-        const affectedCombinations = win.filter(combination => combination.includes(lastMoveIndex));
+        const affectedCombinations = win.filter(combination => combination.includes(lastMoveIndex));  //makes array of last move affected combinations
 
         for (let i = 0; i < affectedCombinations.length; i++) {
             const [a, b, c] = affectedCombinations[i];
@@ -62,8 +62,10 @@ class Game {
             console.log(`Position ${i} is already taken. Player ${this.currentPlayer.symbol} cannot make a move here.`);
             this.makeMove(i); // Retry the move
         }
-        
+
         return this.checkWinner(i); // check for winner after each move
     }
-    
+
 }
+
+let game = new Game();
