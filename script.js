@@ -1,4 +1,8 @@
-// Removed global board variable. It will now be encapsulated within the Game class.
+const readline = require('readline');
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+}); // Create a readline interface for user input - something something node.js
 
 function createPlayer(symbol) {  // Factory function to create a player object with a symbol (X or O) and a method to make moves
     return {
@@ -11,7 +15,7 @@ function createPlayer(symbol) {  // Factory function to create a player object w
 
             if (this.board[i] === '') {
                 this.board[i] = this.symbol;
-                console.log(`Player ${this.symbol} made a move at position ${i}`);
+                console.log(`Player ${this.symbol} made a move at position ${i}`); //template literals
             } else {
                 console.log(`Position ${i} is already taken. Player ${this.symbol} cannot make a move.`);
                 this.gameOver = false; // Track if the game is over
@@ -29,11 +33,7 @@ class Game {  // Class to manage the game state, including players, moves, board
     }
 
     switchPlayer() {
-        if (this.currentPlayer === this.playerX) {
-            this.currentPlayer = this.playerO; // Switch to player O
-        } else {
-            this.currentPlayer = this.playerX; // Switch to player X
-        }
+        this.currentPlayer = this.currentPlayer === this.playerX ? this.playerO : this.playerX;
     }
 
     checkWinner(lastMoveIndex) { // function to check if there is a winner after each move with board index i
@@ -44,7 +44,7 @@ class Game {  // Class to manage the game state, including players, moves, board
         ];                                      // all possible combinations to win
 
         const board = this.board; // Use the encapsulated board property
-        const affectedCombinations = win.filter(combination => combination.includes(lastMoveIndex));
+        const affectedCombinations = win.filter(combination => combination.includes(lastMoveIndex)); // Filter combinations that include the last move index
 
         for (let i = 0; i < affectedCombinations.length; i++) {
             const [a, b, c] = affectedCombinations[i]; // Destructuring to get the values of a, b, c from the combination
@@ -92,6 +92,51 @@ class Game {  // Class to manage the game state, including players, moves, board
         this.currentPlayer = this.playerX; // Reset to player X
         console.log("Game has been reset.");
     }
+
+    displayBoard() {
+        console.log(`
+      ${this.board[0] || ' '} | ${this.board[1] || ' '} | ${this.board[2] || ' '}
+     ---+---+---
+      ${this.board[3] || ' '} | ${this.board[4] || ' '} | ${this.board[5] || ' '}
+     ---+---+---
+      ${this.board[6] || ' '} | ${this.board[7] || ' '} | ${this.board[8] || ' '}
+    `);
+    }
+
+    startGame() {
+        this.resetGame(); // Reset the game state
+        console.log("Welcome to Tic-Tac-Toe!");
+        this.displayBoard();
+        console.log(`Player ${this.currentPlayer.symbol}, it's your turn!`);
+    }
 }
 
-let game = new Game();
+let game = new Game('X', 'O');
+
+function playGame() {
+    game.startGame();
+
+    const askMove = () => {
+        rl.question(`Player ${game.currentPlayer.symbol}, enter your move (0-8): `, (input) => {
+            const move = parseInt(input);
+            if (isNaN(move) || move < 0 || move > 8) {
+                console.log("Invalid move. Please enter a number between 0 and 8.");
+                askMove();
+            } else {
+                const result = game.makeMove(move);
+                game.displayBoard();
+
+                if (result === true) {
+                    askMove(); // Continue the game
+                } else {
+                    console.log("Game over!");
+                    rl.close();
+                }
+            }
+        });
+    };
+
+    askMove();
+}
+
+playGame();
